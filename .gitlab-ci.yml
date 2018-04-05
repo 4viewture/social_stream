@@ -17,7 +17,7 @@ buildComposerDeps:
   before_script:
     - php -v
   script:
-    - composer install --prefer-dist --no-progress --optimize-autoloader
+    - composer install --no-scripts --prefer-dist --no-progress --optimize-autoloader
   tags:
     - docker
   artifacts:
