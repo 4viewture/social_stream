@@ -129,3 +129,14 @@ securityTest:
   tags:
     - docker
 
+
+pages:
+  image: alpine:latest
+  stage: deploy
+  script:
+    - echo 'Nothing to do...'
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
