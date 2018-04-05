@@ -1,0 +1,44 @@
+phpcs:
+    standard: PSR2
+    # number of allowed errors is compared with warnings+errors, or just errors from checkstyle.xml
+    ignoreWarnings: false
+    # https://github.com/squizlabs/PHP_CodeSniffer/wiki/Reporting
+    reports:
+        cli:
+            - full
+        #file:
+            # checkstyle is always included and overriden
+            # checkstyle: checkstyle.xml
+            # you can include custom reports (https://github.com/wikidi/codesniffer/blob/master/reports/wikidi/Summary.php#L39)
+            # ./vendor/owner/package/src/MySummaryReport.php: phpcs-summary.html
+
+php-cs-fixer:
+    # http://cs.sensiolabs.org/#usage
+    rules: '@PSR2'
+    allowRiskyRules: false
+    # by default the tool is runned in dry-run mode (no fixers are applied)
+    isDryRun: true
+
+phpstan:
+    level: 0
+
+phpunit:
+    # binary: vendor/bin/phpunit
+    binary: bin/phpunit
+    # phpunit.xml
+    config: Build/BuildEssentials/PhpUnit/UnitTests.xml
+    reports:
+        file: []
+            # log: [junit, tap, json]
+            # testdox: [html, text]
+            # coverage: [html, clover, crap4j, php, text, xml] # requires XDebug extension
+
+psalm:
+    config: .psalm.xml
+    deadCode: true
+    threads: 5
+    showInfo: true
+
+# Php file extensions to parse.
+extensions:
+    - php
