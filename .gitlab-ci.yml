@@ -1,0 +1,130 @@
+stages:
+  - build
+  - test
+  - deploy
+  - verify
+
+
+#--------------------------------------------------------------------------------
+# 0: Build
+#--------------------------------------------------------------------------------
+
+buildComposerDeps:
+  image: docker.kay-strobach.de/docker/php:7.0
+  stage: build
+  variables:
+    COMPOSER_CACHE_DIR: '.composer'
+  before_script:
+    - php -v
+  script:
+    - composer install --prefer-dist --no-progress --optimize-autoloader
+  tags:
+    - docker
+  artifacts:
+    when: on_success
+    expire_in: 1 hour
+    paths:
+      - Packages
+      - Web
+      - Build
+      - bin
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    untracked: true
+    paths:
+      - Build
+      - bin
+      - .composer
+#--------------------------------------------------------------------------------
+# 1: Stage test
+#--------------------------------------------------------------------------------
+.phpqa:
+  image: docker.kay-strobach.de/docker/php:7.1
+  stage: test
+  variables:
+    COMPOSER_CACHE_DIR: '.composer'
+  before_script:
+    - php -v
+  script:
+    - composer global require edgedesign/phpqa --update-no-dev
+    - composer global require jakub-onderka/php-parallel-lint jakub-onderka/php-console-highlighter phpstan/phpstan vimeo/psalm friendsofphp/php-cs-fixer
+    - mkdir -p public/phpqa
+    - PATH="$PATH:$HOME/.composer/vendor/bin/"
+    - phpqa --report --analyzedDirs . --ignoredDirs Application/Framework,Application/Libraries --buildDir public/phpqa --tools phploc,phpcpd,phpcs,pdepend,phpmd,phpmetrics,php-cs-fixer,parallel-lint,phpstan
+  artifacts:
+    when: always
+    paths:
+      - public
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    untracked: true
+    paths:
+      - qa/phpqa
+      - .composer
+  tags:
+    - docker
+  allow_failure: true
+
+phplint:
+  image: docker.kay-strobach.de/docker/php:7.0
+  stage: test
+  before_script:
+    - php -v
+  script:
+    - bin/phplint
+  tags:
+    - docker
+
+phpCPD:
+  image: docker.kay-strobach.de/docker/php:7.0
+  stage: test
+  before_script:
+    - php -v
+  script:
+    - bin/phpcpd Classes
+  tags:
+    - docker
+  allow_failure: true
+
+phpCS:
+  image: docker.kay-strobach.de/docker/php:7.0
+  stage: test
+  script:
+    - bin/phpcs --standard=PSR2 --colors || true
+  tags:
+    - docker
+
+phpMd:
+  image: docker.kay-strobach.de/docker/php:7.0
+  stage: test
+  script:
+    - bin/phpmd Classes text codesize,unusedcode,design,cleancode,controversial --ignore-violations-on-exit --suffixes php
+  tags:
+    - docker
+  allow_failure: true
+
+phploc:
+  image: docker.kay-strobach.de/docker/php:7.0
+  stage: test
+  script:
+    - phploc --count-tests Classes
+  tags:
+    - docker
+
+securityTest:
+  image: docker.kay-strobach.de/docker/php:7.0
+  stage: test
+  script:
+    - bin/security-checker security:check
+  tags:
+    - docker
+  # added because of paragonie/random_compat (v1.4.2) --> waiting for updates ...
+  allow_failure: true
+
+.stylelint:
+  image: docker.kay-strobach.de/docker/stylelint:latest
+  stage: test
+  script:
+    - stylelint "Resources/Public/Css/*.css"
+  tags:
+    - docker
