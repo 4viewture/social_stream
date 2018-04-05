@@ -71,7 +71,7 @@ phplint:
   before_script:
     - php -v
   script:
-    - bin/phplint
+    - phplint
   tags:
     - docker
 
@@ -81,7 +81,7 @@ phpCPD:
   before_script:
     - php -v
   script:
-    - bin/phpcpd Classes
+    - phpcpd Classes
   tags:
     - docker
   allow_failure: true
@@ -90,7 +90,7 @@ phpCS:
   image: docker.kay-strobach.de/docker/php:7.0
   stage: test
   script:
-    - bin/phpcs --standard=PSR2 --colors || true
+    - phpcs --standard=PSR2 --colors || true
   tags:
     - docker
 
@@ -98,7 +98,7 @@ phpMd:
   image: docker.kay-strobach.de/docker/php:7.0
   stage: test
   script:
-    - bin/phpmd Classes text codesize,unusedcode,design,cleancode,controversial --ignore-violations-on-exit --suffixes php
+    - phpmd Classes text codesize,unusedcode,design,cleancode,controversial --ignore-violations-on-exit --suffixes php
   tags:
     - docker
   allow_failure: true
@@ -115,7 +115,7 @@ securityTest:
   image: docker.kay-strobach.de/docker/php:7.0
   stage: test
   script:
-    - bin/security-checker security:check
+    - security-checker security:check
   tags:
     - docker
   # added because of paragonie/random_compat (v1.4.2) --> waiting for updates ...
@@ -128,3 +128,4 @@ securityTest:
     - stylelint "Resources/Public/Css/*.css"
   tags:
     - docker
+
