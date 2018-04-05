@@ -38,7 +38,7 @@ buildComposerDeps:
 #--------------------------------------------------------------------------------
 # 1: Stage test
 #--------------------------------------------------------------------------------
-.phpqa:
+phpqa:
   image: docker.kay-strobach.de/docker/php:7.1
   stage: test
   variables:
