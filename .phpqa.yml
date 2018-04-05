@@ -22,7 +22,7 @@ php-cs-fixer:
 phpstan:
     level: 0
 
-phpunit:
+.phpunit:
     # binary: vendor/bin/phpunit
     binary: bin/phpunit
     # phpunit.xml
